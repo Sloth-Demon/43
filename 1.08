@@ -1,0 +1,71 @@
+from telethon import TelegramClient, events
+import re
+
+# Ваши значения для api_id и api_hash
+api_id = 'YOUR_API_ID'
+api_hash = 'YOUR_API_HASH'
+
+my_channel_id = '@KotikiOKotiki' # Идентификатор вашего канала
+channels = ['@koshki7', '@samorazvitie_kotiki', '@lovemeowcats', '@meow_kotiki', '@catslovemeow', '@cats_cats', '@Travel_Passion'] # Список ваших каналов для отслеживания
+
+client = TelegramClient('mySession', api_id, api_hash)
+
+print("GRAB - Started")
+
+@client.on(events.NewMessage(chats=channels))
+async def my_event_handler(event):
+    if event.message:
+        message_text = event.message.message
+        print("Original message text:", message_text)
+
+        if event.message.entities:
+            # Проверка на наличие ссылок или упоминаний
+            message_text = re.sub(r'@Travel_Passion', '@KotikiOKotiki', message_text)  # Замена упоминания @Travel_Passion на @Shark_bg
+            message_text = message_text.replace('https://t.me/Travel_Passion', 'https://t.me/KotikiOKotiki')  # Замена ссылок
+
+        if event.message.media:
+            # Если есть медиа (фото, видео, файл), отправляем его вместе с текстом
+            print("Отправка медиа сообщения")
+            await client.send_message(my_channel_id, file=event.message.media, message=message_text)
+        elif event.message.entities:  # Добавлено условие для проверки на наличие упоминаний или ссылок
+            # Отправляем только текст
+            print("Отправка текстового сообщения")
+            await client.send_message(my_channel_id, message=message_text)
+import re
+
+def process_text(text):
+    def replace_links(text):
+        pattern = r'(https?://\S+)|(https?://t\.me/\S+)'
+        replacement = r'[Котики](\1\2)'
+        return re.sub(pattern, replacement, text)
+
+    def replace_mentions(text):
+        pattern = r'@Travel_Passion|@lovemeowcats|@cats_cats'
+        replacement = r'@KotikiOKotiki'
+        return re.sub(pattern, replacement, text)
+
+    processed_text = replace_links(text)
+    processed_text = replace_mentions(processed_text)
+
+    return processed_text
+
+@client.on(events.NewMessage(chats=channels, func=lambda e: e.message.media))  # Обработка альбомов
+async def handle_album(event):
+    message_text = event.message.message
+    print("Original album message text:", message_text)
+
+    if event.message.entities:
+        # Проверка на наличие ссылок или упоминаний
+        message_text = re.sub(r'@Travel_Passion', '@KotikiOKotiki', message_text)  # Замена упоминания @Travel_Passion на @Shark_bg
+        message_text = message_text.replace('https://t.me/Travel_Passion', 'https://t.me/KotikiOKotiki')  # Замена ссылок
+
+    print("Album message after substitution:", message_text)
+
+    # Отправляем альбом с измененным текстом
+    if event.message.media:
+        await client.send_message(my_channel_id, file=await event.message.export(), message=message_text)
+    else:
+        await client.send_message(my_channel_id, file=await event.message.export(), message=message_text)
+
+client.start()
+client.run_until_disconnected()
