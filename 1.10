@@ -1,0 +1,40 @@
+from telethon import TelegramClient, events
+import re
+
+api_id =   # Ваш ID приложения
+api_hash = ''  # Ваш хэш приложения
+my_channel_id = '@KotikiOKotiki'  # Идентификатор вашего канала
+channels = ['@koshki7', '@samorazvitie_kotiki', '@lovemeowcats', '@meow_kotiki', '@catslovemeow', '@cats_cats', '@Travel_Passion', '@meow_meow_cute', '@vkcatism']
+
+client = TelegramClient('mySession', api_id, api_hash)
+
+
+async def process_and_send_message(event):
+    message = event.message
+    message_text = message.message
+
+    processed_message = replace_links_and_mentions(message_text)  # Обрабатываем текст сообщения с упоминаниями и ссылками
+    print("Original message text:", message_text)
+    print("Processed message text:", processed_message)
+
+    if message.media:
+        print("Отправка медиа сообщения")
+        await client.send_file(my_channel_id, file=message.media, caption=processed_message)  # Отправляем медиа с обработанным текстом
+    else:
+        print("Отправка текстового сообщения")
+        await client.send_message(my_channel_id, message=processed_message)  # Отправляем только текст
+
+
+def replace_links_and_mentions(text):
+    # Здесь ваша логика замены ссылок и упоминаний
+    pattern = r'(https?://\S+|https?://t\.me/\S+)|(@Travel_Passion|@koshki7|@cats_cats)'
+    replacement = lambda match: '[@KotikiOKotiki]({})'.format(match.group(0) or '@KotikiOKotiki')
+    return re.sub(pattern, replacement, text)
+
+
+print("GRAB - Started")
+
+client.add_event_handler(process_and_send_message, events.NewMessage(chats=channels))  # Добавляем обработчик события
+
+client.start()
+client.run_until_disconnected()
