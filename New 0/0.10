@@ -1,0 +1,34 @@
+import asyncio
+from telethon import TelegramClient, events
+
+api_id = ''   # Your application ID
+api_hash = ''  # Your application hash
+my_channel_id = '@KotikiOKotiki'  # Your channel ID
+channels = ['@koshki7', '@samorazvitie_kotiki', '@lovemeowcats', '@meow_kotiki', '@catslovemeow', '@cats_cats', '@Travel_Passion', '@meow_meow_cute', '@vkcatism']
+
+client = TelegramClient('myGrab', api_id, api_hash)
+print("GRAB - Started")
+
+album_sent = False  # Track if album is sent
+
+@client.on(events.Album(chats=channels))
+async def handler(event):
+    global album_sent
+    await client.send_message(
+        my_channel_id,
+        file=event.messages,
+        message=event.original_update.message.message,
+    )
+    album_sent = True
+
+@client.on(events.NewMessage(chats=channels))
+async def my_event_handler(event):
+    global album_sent
+    if not album_sent:
+        if event.message and not hasattr(event.message, 'media'):  # Check if the message is not an album
+            await asyncio.sleep(2)
+            await client.send_message(my_channel_id, event.message)
+    album_sent = False  # Reset album_sent flag after processing
+
+client.start()
+client.run_until_disconnected()
