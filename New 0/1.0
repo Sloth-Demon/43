@@ -1,8 +1,8 @@
 from telethon import TelegramClient, events
 import re
 
-api_id = '20785699'   # Your application ID
-api_hash = '42a49e3d5f1f42b1d11b01e994048482'  # Your application hash
+api_id = ''   # Your application ID
+api_hash = ''  # Your application hash
 my_channel_id = '@KotikiOKotiki'  # Your channel ID
 channels = ['@koshki7', '@samorazvitie_kotiki', '@lovemeowcats', '@meow_kotiki', '@catslovemeow', '@cats_cats', '@vkcatism', '@TEST_TESTBEST', '@TEST_BESTTEST']
 
